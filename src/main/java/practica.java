@@ -1,8 +1,11 @@
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.FormElement;
 import org.jsoup.select.Elements;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class practica {
@@ -24,6 +27,8 @@ public class practica {
         //CANTIDAD DE INPUT Y TIPO          (E)
         System.out.println("Acápite E)");
         CantidadInput(url);
+        System.out.println("Acápite F)");
+        FormsParseados(url);
 
 
 
@@ -56,7 +61,7 @@ public static int Lineas (String url) throws IOException{
     public static int CantidadFormsPost(String url) throws IOException{
         Document documento = Jsoup.connect(url).get();
         int cantidad = 0;
-        cantidad = documento.select("form[method= 'post' ]").size();
+        cantidad = documento.select("form[method='post']").size();
 
         return cantidad;
     }
@@ -64,7 +69,7 @@ public static int Lineas (String url) throws IOException{
     public static int CantidadFormsGet(String url) throws IOException{
         Document documento = Jsoup.connect(url).get();
         int cantidad = 0;
-        cantidad = documento.select("form[method= 'get' ]").size();
+        cantidad = documento.select("form[method='get']").size();
 
         return cantidad;
     }
@@ -81,6 +86,30 @@ public static int Lineas (String url) throws IOException{
                 cantInput++;
             }
             cantForm++;
+        }
+    }
+
+    private static void FormsParseados(String url) throws IOException{
+      String matr = "2014-0677";
+       HashMap<String, String> fData = new HashMap<>();
+       fData.put("Asignatura","Practica1");
+
+        Document doc = Jsoup.connect(url).get();
+        Elements forms = doc.select("form");
+        for(Element form : forms){
+
+            if(form.attr("method").equals("post")){
+
+               Connection connection = ((FormElement)form).submit();
+               connection
+                       .data(fData)
+                       .header("Matricula", matr);
+
+               Connection.Response respuesta = connection.execute();
+
+                System.out.println("Body: " + respuesta.body());
+
+            }
         }
     }
 
